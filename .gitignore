@@ -1,0 +1,38 @@
+# Ignore Python cache and logs
+__pycache__/
+*.py[cod]
+*.log
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Ignore notebook metadata (if you strip outputs)
+*.nbconvert.ipynb
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore dotenv files (for secrets)
+.env
+
+# Ignore Jupyter Notebook config and runtime files
+.jupyter/
+.ipython/
+
+# Optional: ignore data files (adjust based on your needs)
+*.csv
+*.tsv
+*.h5
+*.hdf5
+*.db
+*.sqlite
+
+# Ignore outputs if notebooks are being cleaned before commit
+**/*-checkpoint.ipynb
