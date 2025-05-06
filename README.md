@@ -1,23 +1,25 @@
-📘 AI-Powered Bilingual Book Alignment with OpenAI & spaCy
-Transform two editions of the same book (e.g., Russian and Spanish) into a bilingual reading experience using semantic embeddings and language models. This project aligns matching fragments from both versions using OpenAI embeddings and spaCy NLP.
 
-📌 Overview
+# 📘 AI-Powered Bilingual Book Alignment with OpenAI & spaCy
+
+Transform two editions of the same book (e.g., Russian and Spanish) into a **bilingual reading experience** using semantic embeddings and language models. This project aligns matching fragments from both versions using `OpenAI` embeddings and `spaCy` NLP.
+
+---
+
+## 📌 Overview
+
 We aim to:
+- Segment the Russian edition into context-rich fragments
+- Embed and match them semantically with fragments from the Spanish edition
+- Build a parallel, bilingual text for immersive reading (and audiobook generation!)
 
-Segment the Russian edition into context-rich fragments
+---
 
-Embed and match them semantically with fragments from the Spanish edition
+## 🧰 Prerequisites
 
-Build a parallel, bilingual text for immersive reading (and audiobook generation!)
+- Python 3.11 (not 3.13+ due to spaCy compatibility)
+- `spaCy`, `openai`, `googletrans`, `more-itertools`, and `numpy`
 
-🧰 Prerequisites
-Python 3.11 (not 3.13+ due to spaCy compatibility)
-
-spaCy, openai, googletrans, more-itertools, and numpy
-
-bash
-Copy
-Edit
+```bash
 # Set up environment
 pyenv virtualenv 3.11.8 bilingual-align
 pyenv activate bilingual-align
@@ -26,10 +28,13 @@ pyenv activate bilingual-align
 pip install spacy openai googletrans==4.0.0-rc1 more-itertools numpy
 python -m spacy download ru_core_news_lg
 python -m spacy download es_dep_news_trf
-Step 1: Split the Native Text into Chunks
-python
-Copy
-Edit
+```
+
+---
+
+## Step 1: Split the Native Text into Chunks
+
+```python
 import spacy
 nlp_ru = spacy.load("ru_core_news_lg")
 
@@ -49,10 +54,13 @@ def split_into_chunks(text: str, max_chars: int = 300) -> list:
         chunks.append(current_chunk)
 
     return chunks
-Load and Process File
-python
-Copy
-Edit
+```
+
+---
+
+### Load and Process File
+
+```python
 from pathlib import Path
 
 def load_text_from_file(filepath: str) -> str:
@@ -60,30 +68,36 @@ def load_text_from_file(filepath: str) -> str:
 
 text_ru = load_text_from_file("text_rus.txt")
 chunks_ru = split_into_chunks(text_ru, max_chars=300)
-Step 2: Break Long Spanish Sentences
-Some Russian sentences may correspond to a single long sentence in Spanish. We'll split these to improve alignment.
+```
 
-python
-Copy
-Edit
+---
+
+## Step 2: Break Long Spanish Sentences
+
+Some Russian sentences may correspond to a **single long sentence** in Spanish. We'll split these to improve alignment.
+
+```python
 from more_itertools import split_at
 
 def break_long_sentences(doc):
     sublists = list(" ".join(line) for line in split_at([d.text for d in doc], lambda x: x == ","))
     return [chunk + ',' if i < len(sublists) - 1 else chunk for i, chunk in enumerate(sublists)]
-Step 3: Translate & Embed Chunks
-python
-Copy
-Edit
+```
+
+---
+
+## Step 3: Translate & Embed Chunks
+
+```python
 from googletrans import Translator
 translator = Translator()
 
 async def translate_russian_to_spanish(text: str) -> str:
     result = await translator.translate(text, src="ru", dest="es")
     return result.text
-python
-Copy
-Edit
+```
+
+```python
 from openai import OpenAI
 from typing import List
 import numpy as np
@@ -97,49 +111,51 @@ def get_embedding(text: str, model="text-embedding-3-small", **kwargs) -> List[f
 
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-Example Match & Score
-python
-Copy
-Edit
+```
+
+---
+
+### Example Match & Score
+
+```python
 # Evaluate semantic similarity between the first chunk in Russian and the first 3 chunks in Spanish
 translated_ru = await translate_russian_to_spanish(chunks_ru[0])
 es_snippet = " ".join(chunks_es[0:3])
 
 similarity = cosine_similarity(get_embedding(translated_ru), get_embedding(es_snippet))
 print(similarity)
+```
+
 Expected output:
-
-python
-Copy
-Edit
+```python
 0.8654  # High score indicates a strong semantic match
-🔁 Alignment Strategy
-Use a greedy pointer-based alignment algorithm:
+```
 
-Translate a Russian chunk into Spanish
+---
 
-Expand Spanish chunks one by one
+## 🔁 Alignment Strategy
 
-Track the similarity score
-
-Stop when the score starts decreasing
+Use a **greedy pointer-based alignment** algorithm:
+1. Translate a Russian chunk into Spanish
+2. Expand Spanish chunks one by one
+3. Track the similarity score
+4. Stop when the score starts decreasing
 
 This helps find the best one-to-many match between the two texts.
 
-🔜 Coming Next
-A complete alignment script
+---
 
-Automatic generation of a bilingual book
+## 🔜 Coming Next
 
-Bonus: Convert it into a bilingual audiobook using Google Text-to-Speech!
+- A complete alignment script
+- Automatic generation of a bilingual book
+- Bonus: Convert it into a **bilingual audiobook** using Google Text-to-Speech!
 
-📎 Resources
-OpenAI Embeddings Guide
+---
 
-Semantic Search Example
+## 📎 Resources
 
-spaCy
-
-Cosine Similarity (Wikipedia)
-
-
+- [OpenAI Embeddings Guide](https://platform.openai.com/docs/guides/embeddings)
+- [Semantic Search Example](https://cookbook.openai.com/examples/semantic_text_search_using_embeddings)
+- [spaCy](https://spacy.io/)
+- [Cosine Similarity (Wikipedia)](https://en.wikipedia.org/wiki/Cosine_similarity)
