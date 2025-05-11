@@ -6,7 +6,7 @@ class SemanticZippingChunksWithLogo(Scene):
         # Configuration
         rect_width = 3
         rect_height = rect_width * 1.41
-        num_chunks = 5
+        num_chunks = 6
         chunk_height = rect_height / num_chunks
 
         # Rectangle shells
@@ -43,7 +43,7 @@ class SemanticZippingChunksWithLogo(Scene):
 
         # Merge into center with slicing from top of right
         center_chunks = []
-        current_y = rect_height / 2 - chunk_height / 2
+        current_y = rect_height / 1.5 - chunk_height / 2
         right_slice_top = right_rect.get_top()[1]
 
         for i, left_group in enumerate(left_chunks):
@@ -53,7 +53,7 @@ class SemanticZippingChunksWithLogo(Scene):
             current_y -= chunk_height
 
             # Simulate slicing right chunk from top with random height
-            slice_height = chunk_height * random.uniform(0.5, 1.0)
+            slice_height = chunk_height * random.uniform(0.7, 1.5)
             rb = Rectangle(
                 width=rect_width,
                 height=slice_height,
