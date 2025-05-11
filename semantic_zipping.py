@@ -6,8 +6,9 @@ class SemanticZippingChunksWithLogo(Scene):
         # Configuration
         rect_width = 3
         rect_height = rect_width * 1.41
-        num_chunks = 6
+        num_chunks = 5
         chunk_height = rect_height / num_chunks
+        scale_factor = 0.6  # 60% of original size
 
         # Rectangle shells
         left_rect = Rectangle(width=rect_width, height=rect_height).to_corner(LEFT + UP)
@@ -43,17 +44,20 @@ class SemanticZippingChunksWithLogo(Scene):
 
         # Merge into center with slicing from top of right
         center_chunks = []
-        current_y = rect_height / 1.5 - chunk_height / 2
+        current_y = rect_height / 2 - chunk_height / 2
         right_slice_top = right_rect.get_top()[1]
 
         for i, left_group in enumerate(left_chunks):
-            # Move left chunk to next position in center stack
-            self.play(left_group.animate.move_to([0, current_y, 0]).set_z_index(1), run_time=0.5)
+            # Move left chunk to next position in center stack with scaling
+            self.play(
+                left_group.animate.scale(scale_factor).move_to([0, current_y, 0]).set_z_index(1),
+                run_time=0.5
+            )
             center_chunks.append(left_group)
-            current_y -= chunk_height
+            current_y -= chunk_height * scale_factor
 
             # Simulate slicing right chunk from top with random height
-            slice_height = chunk_height * random.uniform(0.7, 1.5)
+            slice_height = chunk_height * random.uniform(0.5, 1.0)
             rb = Rectangle(
                 width=rect_width,
                 height=slice_height,
@@ -67,9 +71,16 @@ class SemanticZippingChunksWithLogo(Scene):
             right_group = VGroup(rb, rb_label)
             self.add(right_group)
 
-            # Move it under the corresponding left chunk
-            self.play(right_group.animate.move_to([0, current_y - slice_height / 2 + chunk_height / 2, 0]).set_z_index(1), run_time=0.5)
-            current_y -= slice_height
+            # Move it under the corresponding left chunk with scaling
+            self.play(
+                right_group.animate.scale(scale_factor).move_to([
+                    0,
+                    current_y - slice_height * scale_factor / 2 + chunk_height * scale_factor / 2,
+                    0
+                ]).set_z_index(1),
+                run_time=0.5
+            )
+            current_y -= slice_height * scale_factor
             center_chunks.append(right_group)
 
         self.wait(0.5)
