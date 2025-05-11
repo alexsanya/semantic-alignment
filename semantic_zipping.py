@@ -31,8 +31,17 @@ class SemanticZippingChunksWithLogo(Scene):
         ru_label = Text("RU", font_size=30).move_to(left_rect.get_center()).set_z_index(5)
         es_label = Text("ES", font_size=30).move_to(right_rect.get_center()).set_z_index(5)
 
+        # Cover images on top
+        cover_ru = ImageMobject("coverRu.png").scale_to_fit_width(rect_width).set_z_index(10)
+        cover_ru.move_to(left_rect.get_center())
+        cover_es = ImageMobject("coverEs.png").scale_to_fit_width(rect_width).set_z_index(10)
+        cover_es.move_to(right_rect.get_center())
+
         # Instantly add elements to the scene
-        self.add(left_rect, right_fill, right_rect, t_left, t_right, ru_label, es_label)
+        self.add(left_rect, right_fill, right_rect, t_left, t_right, ru_label, es_label, cover_ru, cover_es)
+
+        self.wait(1)
+        self.play(FadeOut(cover_ru), FadeOut(cover_es), run_time=1)
 
         # Create left chunks without labels initially
         left_chunks = []
@@ -68,7 +77,6 @@ class SemanticZippingChunksWithLogo(Scene):
         right_slice_top = right_rect.get_top()[1]
 
         for i, lb in enumerate(left_chunks):
-            # Move left chunk to next position in center stack with scaling
             self.play(
                 lb.animate.scale(scale_factor).move_to([0, current_y, 0]).set_z_index(1),
                 run_time=0.5
@@ -78,7 +86,6 @@ class SemanticZippingChunksWithLogo(Scene):
             center_chunks.append(VGroup(lb, lb_label))
             current_y -= chunk_height * scale_factor
 
-            # Slice right chunk with precomputed height
             slice_height = right_heights[i]
             rb = Rectangle(
                 width=rect_width,
@@ -88,7 +95,6 @@ class SemanticZippingChunksWithLogo(Scene):
             )
             rb.move_to([right_rect.get_center()[0], right_slice_top - slice_height / 2, 0])
 
-            # Draw a bottom border line at the new slice boundary
             mark_line = Line(
                 start=[right_rect.get_left()[0], right_slice_top - slice_height, 0],
                 end=[right_rect.get_right()[0], right_slice_top - slice_height, 0],
@@ -96,7 +102,6 @@ class SemanticZippingChunksWithLogo(Scene):
                 stroke_width=1.5
             ).set_z_index(3)
 
-            # Add black chunk in place of removed green chunk
             black_chunk = Rectangle(
                 width=rect_width,
                 height=slice_height,
@@ -111,7 +116,6 @@ class SemanticZippingChunksWithLogo(Scene):
             rb_label = Text("es", font_size=20, color=BLACK)
             self.add(rb, mark_line)
 
-            # Move it under the corresponding left chunk with scaling
             self.play(
                 rb.animate.scale(scale_factor).move_to([
                     0,
@@ -127,8 +131,7 @@ class SemanticZippingChunksWithLogo(Scene):
 
         self.wait(0.5)
 
-        # Add OpenAI logo on top
-        logo = SVGMobject("openai_logo.svg")  # <-- Path to your SVG file
+        logo = SVGMobject("openai_logo.svg")
         logo.scale(0.7)
         logo.next_to([0, rect_height / 2, 0], UP, buff=0.3)
 
