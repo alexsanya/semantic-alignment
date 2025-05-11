@@ -21,27 +21,18 @@ class SemanticZippingChunksWithLogo(Scene):
             fill_color=GREEN,
             fill_opacity=0.8,
             stroke_opacity=0
-        ).move_to(right_rect.get_center())
-
-        # Black overlay to simulate "emptied" space
-        black_cover = Rectangle(
-            width=rect_width,
-            height=0,
-            fill_color=BLACK,
-            fill_opacity=1,
-            stroke_opacity=0
-        ).move_to(right_rect.get_top(), DOWN)
+        ).move_to(right_rect.get_center()).set_z_index(0)
 
         # Corner labels
-        t_left = Text("T", font_size=24).next_to(left_rect.get_corner(UL), DOWN + RIGHT, buff=0.2)
-        t_right = Text("T", font_size=24).next_to(right_rect.get_corner(UL), DOWN + RIGHT, buff=0.2)
+        t_left = Text("T", font_size=24).next_to(left_rect.get_corner(UL), DOWN + RIGHT, buff=0.2).set_z_index(5)
+        t_right = Text("T", font_size=24).next_to(right_rect.get_corner(UL), DOWN + RIGHT, buff=0.2).set_z_index(5)
 
         # Center language tags
-        ru_label = Text("RU", font_size=30).move_to(left_rect.get_center())
-        es_label = Text("ES", font_size=30).move_to(right_rect.get_center())
+        ru_label = Text("RU", font_size=30).move_to(left_rect.get_center()).set_z_index(5)
+        es_label = Text("ES", font_size=30).move_to(right_rect.get_center()).set_z_index(5)
 
         # Instantly add elements to the scene
-        self.add(left_rect, right_fill, black_cover, right_rect, t_left, t_right, ru_label, es_label)
+        self.add(left_rect, right_fill, right_rect, t_left, t_right, ru_label, es_label)
 
         # Create left chunks without labels initially
         left_chunks = []
@@ -82,7 +73,7 @@ class SemanticZippingChunksWithLogo(Scene):
                 lb.animate.scale(scale_factor).move_to([0, current_y, 0]).set_z_index(1),
                 run_time=0.5
             )
-            lb_label = left_labels[i].move_to(lb.get_center()).set_z_index(2)
+            lb_label = left_labels[i].move_to(lb.get_center()).set_z_index(3)
             self.add(lb_label)
             center_chunks.append(VGroup(lb, lb_label))
             current_y -= chunk_height * scale_factor
@@ -103,10 +94,18 @@ class SemanticZippingChunksWithLogo(Scene):
                 end=[right_rect.get_right()[0], right_slice_top - slice_height, 0],
                 color=GRAY,
                 stroke_width=1.5
-            )
+            ).set_z_index(3)
 
-            # Animate black overlay to cover emptied area
-            self.play(black_cover.animate.stretch_to_fit_height(rect_height - (right_slice_top - slice_height - right_rect.get_bottom()[1])).move_to([right_rect.get_center()[0], (right_slice_top + right_rect.get_bottom()[1] - slice_height) / 2, 0]), run_time=0.5)
+            # Add black chunk in place of removed green chunk
+            black_chunk = Rectangle(
+                width=rect_width,
+                height=slice_height,
+                fill_color=BLACK,
+                fill_opacity=1.0,
+                stroke_opacity=0
+            ).move_to([right_rect.get_center()[0], right_slice_top - slice_height / 2, 0]).set_z_index(2)
+            self.add(black_chunk)
+
             right_slice_top -= slice_height
 
             rb_label = Text("es", font_size=20, color=BLACK)
@@ -121,7 +120,7 @@ class SemanticZippingChunksWithLogo(Scene):
                 ]).set_z_index(1),
                 run_time=0.5
             )
-            rb_label.move_to(rb.get_center()).set_z_index(2)
+            rb_label.move_to(rb.get_center()).set_z_index(3)
             self.add(rb_label)
             current_y -= slice_height * scale_factor
             center_chunks.append(VGroup(rb, rb_label))
