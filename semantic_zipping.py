@@ -37,8 +37,12 @@ class SemanticZippingChunksWithLogo(Scene):
         cover_es = ImageMobject("coverEs.png").scale_to_fit_width(rect_width).set_z_index(10)
         cover_es.move_to(right_rect.get_center())
 
+        # OpenAI logo as image at start (above center stack)
+        top_logo = ImageMobject("openAi_logo.png").scale(0.4)
+        top_logo.move_to([0, rect_height / 2 + 1.3, 0]).set_z_index(5)
+
         # Instantly add elements to the scene
-        self.add(left_rect, right_fill, right_rect, t_left, t_right, ru_label, es_label, cover_ru, cover_es)
+        self.add(left_rect, right_fill, right_rect, t_left, t_right, ru_label, es_label, cover_ru, cover_es, top_logo)
 
         self.wait(1)
         self.play(FadeOut(cover_ru), FadeOut(cover_es), run_time=1)
