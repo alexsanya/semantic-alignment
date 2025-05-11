@@ -1,4 +1,5 @@
 from manim import *
+import random
 
 class SemanticZippingChunksWithLogo(Scene):
     def construct(self):
@@ -23,13 +24,10 @@ class SemanticZippingChunksWithLogo(Scene):
         # Instantly add elements to the scene
         self.add(left_rect, right_rect, t_left, t_right, ru_label, es_label)
 
-        # Create left and right chunks with labels
+        # Create left chunks with labels
         left_chunks = []
-        right_chunks = []
         for i in range(num_chunks):
             y_offset = rect_height / 2 - chunk_height / 2 - i * chunk_height
-
-            # Left chunk (blue)
             lb = Rectangle(
                 width=rect_width,
                 height=chunk_height,
@@ -37,31 +35,37 @@ class SemanticZippingChunksWithLogo(Scene):
                 fill_opacity=0.8
             ).move_to(left_rect.get_center() + UP * y_offset)
             lb_label = Text("ru", font_size=20, color=WHITE).move_to(lb.get_center())
-            left_chunks.append(VGroup(lb, lb_label))
-
-            # Right chunk (green)
-            rb = Rectangle(
-                width=rect_width,
-                height=chunk_height,
-                fill_color=GREEN,
-                fill_opacity=0.8
-            ).move_to(right_rect.get_center() + UP * y_offset)
-            rb_label = Text("es", font_size=20, color=WHITE).move_to(rb.get_center())
-            right_chunks.append(VGroup(rb, rb_label))
-
-            self.add(lb, lb_label, rb, rb_label)
+            chunk_group = VGroup(lb, lb_label)
+            left_chunks.append(chunk_group)
+            self.add(chunk_group)
 
         self.wait(0.5)
 
-        # Alternating stack of chunks from top to bottom
+        # Merge into center with slicing from right
         center_chunks = []
-        for i in range(num_chunks):
-            center_chunks.append(left_chunks[i])
-            center_chunks.append(right_chunks[i])
+        for i, left_group in enumerate(left_chunks):
+            # Move left chunk to next position in center stack
+            target_y = rect_height / 2 - chunk_height / 2 - 2 * i * chunk_height
+            self.play(left_group.animate.move_to([0, target_y, 0]).set_z_index(1), run_time=0.5)
+            center_chunks.append(left_group)
 
-        for i, chunk_group in enumerate(center_chunks):
-            target_y = rect_height / 2 - chunk_height / 2 - i * chunk_height
-            self.play(chunk_group.animate.move_to([0, target_y, 0]).set_z_index(1), run_time=0.5)
+            # Simulate slicing right chunk
+            slice_width = rect_width * random.uniform(0.5, 1.0)
+            rb = Rectangle(
+                width=slice_width,
+                height=chunk_height,
+                fill_color=GREEN,
+                fill_opacity=0.8
+            )
+            rb.move_to(right_rect.get_corner(DOWN + LEFT) + UR * [slice_width / 2, (i + 0.5) * chunk_height, 0])
+            rb_label = Text("es", font_size=20, color=WHITE).move_to(rb.get_center())
+            right_group = VGroup(rb, rb_label)
+            self.add(right_group)
+
+            # Move it under the corresponding left chunk
+            target_y = rect_height / 2 - chunk_height / 2 - (2 * i + 1) * chunk_height
+            self.play(right_group.animate.move_to([0, target_y, 0]).set_z_index(1), run_time=0.5)
+            center_chunks.append(right_group)
 
         self.wait(0.5)
 
