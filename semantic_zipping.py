@@ -41,30 +41,35 @@ class SemanticZippingChunksWithLogo(Scene):
 
         self.wait(0.5)
 
-        # Merge into center with slicing from right
+        # Merge into center with slicing from top of right
         center_chunks = []
+        current_y = rect_height / 2 - chunk_height / 2
+        right_slice_top = right_rect.get_top()[1]
+
         for i, left_group in enumerate(left_chunks):
             # Move left chunk to next position in center stack
-            target_y = rect_height / 2 - chunk_height / 2 - 2 * i * chunk_height
-            self.play(left_group.animate.move_to([0, target_y, 0]).set_z_index(1), run_time=0.5)
+            self.play(left_group.animate.move_to([0, current_y, 0]).set_z_index(1), run_time=0.5)
             center_chunks.append(left_group)
+            current_y -= chunk_height
 
-            # Simulate slicing right chunk
-            slice_width = rect_width * random.uniform(0.5, 1.0)
+            # Simulate slicing right chunk from top with random height
+            slice_height = chunk_height * random.uniform(0.5, 1.0)
             rb = Rectangle(
-                width=slice_width,
-                height=chunk_height,
+                width=rect_width,
+                height=slice_height,
                 fill_color=GREEN,
                 fill_opacity=0.8
             )
-            rb.move_to(right_rect.get_corner(DOWN + LEFT) + UR * [slice_width / 2, (i + 0.5) * chunk_height, 0])
+            rb.move_to([right_rect.get_center()[0], right_slice_top - slice_height / 2, 0])
+            right_slice_top -= slice_height
+
             rb_label = Text("es", font_size=20, color=WHITE).move_to(rb.get_center())
             right_group = VGroup(rb, rb_label)
             self.add(right_group)
 
             # Move it under the corresponding left chunk
-            target_y = rect_height / 2 - chunk_height / 2 - (2 * i + 1) * chunk_height
-            self.play(right_group.animate.move_to([0, target_y, 0]).set_z_index(1), run_time=0.5)
+            self.play(right_group.animate.move_to([0, current_y - slice_height / 2 + chunk_height / 2, 0]).set_z_index(1), run_time=0.5)
+            current_y -= slice_height
             center_chunks.append(right_group)
 
         self.wait(0.5)
