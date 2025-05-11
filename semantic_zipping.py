@@ -83,7 +83,7 @@ class SemanticZippingChunksWithLogo(Scene):
         for i, lb in enumerate(left_chunks):
             self.play(
                 lb.animate.scale(scale_factor).move_to([0, current_y, 0]).set_z_index(1),
-                run_time=0.5
+                run_time=0.7
             )
             lb_label = left_labels[i].move_to(lb.get_center()).set_z_index(3)
             self.add(lb_label)
@@ -126,7 +126,7 @@ class SemanticZippingChunksWithLogo(Scene):
                     current_y - slice_height * scale_factor / 2 + chunk_height * scale_factor / 2,
                     0
                 ]).set_z_index(1),
-                run_time=0.5
+                run_time=0.7
             )
             rb_label.move_to(rb.get_center()).set_z_index(3)
             self.add(rb_label)
