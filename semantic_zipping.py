@@ -25,8 +25,9 @@ class SemanticZippingChunksWithLogo(Scene):
         # Instantly add elements to the scene
         self.add(left_rect, right_rect, t_left, t_right, ru_label, es_label)
 
-        # Create left chunks with labels
+        # Create left chunks without labels initially
         left_chunks = []
+        left_labels = []
         for i in range(num_chunks):
             y_offset = rect_height / 2 - chunk_height / 2 - i * chunk_height
             lb = Rectangle(
@@ -35,10 +36,10 @@ class SemanticZippingChunksWithLogo(Scene):
                 fill_color=BLUE,
                 fill_opacity=0.8
             ).move_to(left_rect.get_center() + UP * y_offset)
-            lb_label = Text("ru", font_size=20, color=WHITE).move_to(lb.get_center())
-            chunk_group = VGroup(lb, lb_label)
-            left_chunks.append(chunk_group)
-            self.add(chunk_group)
+            lb_label = Text("ru", font_size=20, color=WHITE)
+            left_chunks.append(lb)
+            left_labels.append(lb_label)
+            self.add(lb)
 
         self.wait(0.5)
 
@@ -47,13 +48,15 @@ class SemanticZippingChunksWithLogo(Scene):
         current_y = rect_height / 2 - chunk_height / 2
         right_slice_top = right_rect.get_top()[1]
 
-        for i, left_group in enumerate(left_chunks):
+        for i, lb in enumerate(left_chunks):
             # Move left chunk to next position in center stack with scaling
             self.play(
-                left_group.animate.scale(scale_factor).move_to([0, current_y, 0]).set_z_index(1),
+                lb.animate.scale(scale_factor).move_to([0, current_y, 0]).set_z_index(1),
                 run_time=0.5
             )
-            center_chunks.append(left_group)
+            lb_label = left_labels[i].move_to(lb.get_center())
+            self.add(lb_label)
+            center_chunks.append(VGroup(lb, lb_label))
             current_y -= chunk_height * scale_factor
 
             # Simulate slicing right chunk from top with random height
@@ -67,21 +70,22 @@ class SemanticZippingChunksWithLogo(Scene):
             rb.move_to([right_rect.get_center()[0], right_slice_top - slice_height / 2, 0])
             right_slice_top -= slice_height
 
-            rb_label = Text("es", font_size=20, color=WHITE).move_to(rb.get_center())
-            right_group = VGroup(rb, rb_label)
-            self.add(right_group)
+            rb_label = Text("es", font_size=20, color=WHITE)
+            self.add(rb)
 
             # Move it under the corresponding left chunk with scaling
             self.play(
-                right_group.animate.scale(scale_factor).move_to([
+                rb.animate.scale(scale_factor).move_to([
                     0,
                     current_y - slice_height * scale_factor / 2 + chunk_height * scale_factor / 2,
                     0
                 ]).set_z_index(1),
                 run_time=0.5
             )
+            rb_label.move_to(rb.get_center())
+            self.add(rb_label)
             current_y -= slice_height * scale_factor
-            center_chunks.append(right_group)
+            center_chunks.append(VGroup(rb, rb_label))
 
         self.wait(0.5)
 
