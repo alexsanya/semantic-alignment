@@ -35,8 +35,9 @@ class SemanticZippingChunksWithLogo(Scene):
                 height=chunk_height,
                 fill_color=BLUE,
                 fill_opacity=0.8
-            ).move_to(left_rect.get_center() + UP * y_offset)
-            lb_label = Text("ru", font_size=20, color=WHITE)
+            ).move_to(left_rect.get_center() + UP * y_offset).set_z_index(2)
+            lb_label = Text("ru", font_size=20, color=BLACK)
+            lb_label.set_z_index(2)
             left_chunks.append(lb)
             left_labels.append(lb_label)
             self.add(lb)
@@ -70,7 +71,7 @@ class SemanticZippingChunksWithLogo(Scene):
             rb.move_to([right_rect.get_center()[0], right_slice_top - slice_height / 2, 0])
             right_slice_top -= slice_height
 
-            rb_label = Text("es", font_size=20, color=WHITE)
+            rb_label = Text("es", font_size=20, color=BLACK)
             self.add(rb)
 
             # Move it under the corresponding left chunk with scaling
@@ -82,7 +83,7 @@ class SemanticZippingChunksWithLogo(Scene):
                 ]).set_z_index(1),
                 run_time=0.5
             )
-            rb_label.move_to(rb.get_center())
+            rb_label.move_to(rb.get_center()).set_z_index(2)
             self.add(rb_label)
             current_y -= slice_height * scale_factor
             center_chunks.append(VGroup(rb, rb_label))
